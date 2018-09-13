@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+	<script type="text/javascript" src="jquery-3.3.1.min.js"></script>
+  <title>Ent2</title>
+</head>
+<body>
+ <canvas id="myCanvas" width="1000" height="1000" style="border: 1px solid black"></canvas>
+	
+	<script>var canvas = document.getElementById('myCanvas');
+var context = canvas.getContext('2d');
+
+var width = canvas.width;
+var height = canvas.height;
+
+
+var img = new Image();
+
+img.src='https://raw.githubusercontent.com/Dataloren/test-repository/master/spock1.png';
+
+var shipName = 'USS ENTERPRISE';
+var codeName = 'NCC-1701A';
+context.font='10pt Arial';
+var scaleShipName = 4;
+var ussTextMeasure = context.measureText(shipName);
+context.font='15pt Arial';
+var scaleCode = 2;
+var codeTextMeasure = context.measureText(codeName);
+
+var numStars = 600;
+var stars = [];
+var sky = width;
+var centerX = width/2;
+var centerY = height/2;
+var radius = Math.random() * 1.2;
+var speed = 10;
+for (var i = 0; i < numStars; i++) {
+  stars[i] = new starry();
+}
+
+function starry (){
+   this.x = Math.random() * width;
+   this.y = Math.random() * height;
+   this.z = Math.random() * width;
+   this.move = function(){
+     this.z = this.z - speed;
+     if(this.z <= 0){
+      this.z = width;
+     }
+   }
+
+   this.show = function (){
+     var x, y, s;
+     x = (this.x - centerX)*(sky/this.z);
+     x = x + centerX;
+     y = (this.y - centerY)*(sky/this.z);
+     y = y + centerY;
+     s = radius * (sky/this.z);
+     context.beginPath();
+     context.fillStyle = "hsla(200,100%,50%,0.8)";
+     context.arc(x, y, s, 0, Math.PI*2);
+     context.fill();
+   }
+}
+
+function drawStars(){
+
+  context.shadowBlur = 0;
+  context.shadowOffsetX = 0;
+  context.shadowOffsetY = 0;
+
+  for (var i = 0; i < numStars; i++) {
+    context.shadowBlur = 0;
+    context.shadowOffsetX = 0;
+    context.shadowOffsetY = 0;
+    stars[i].show();
+    stars[i].move();
+  }
+}
+
+function drawEnterprise(cx, cy, r) {
+//*creating Enterprise*//
+  var depth = 10;
+  context.shadowColor = 'hsl(180, 25%, 25%,0.9)';
+  context.shadowBlur = 20;
+  context.shadowOffsetX = depth + 6;
+  context.shadowOffsetY = depth + 6;
+  context.fillStyle ='hsl(0, 0%, 85%)';
+
+//*neck
+  context.save();
+  context.beginPath();
+  context.rect(cx+width/2.18, cy+height/1.85, 70, 200);
+  context.restore();
+  context.fill();
+
+//*bridge
+  context.save();
+  context.beginPath();
+  context.arc(cx+width/2, cy+height/2, r, 0, 2 * Math.PI, false);
+  context.restore();
+  context.fill();
+
+//*pillars
+  context.save();
+  context.translate(width/2, height/3);
+  context.beginPath();
+  context.rotate(40*Math.PI/180);
+  context.rect(cx+320, cy-220, 30, 600);
+  context.restore();
+  context.fill();
+
+  context.save();
+  context.translate(width/2, height/3);
+  context.scale(-1, 1);
+  context.beginPath();
+  context.rotate(40*Math.PI/180);
+  context.rect(cx+320, cy-220, 30, 600);
+  context.restore();
+  context.fill();
+
+//*nacelles
+  context.save();
+  context.translate(width/2, height/2);
+  context.beginPath();
+  context.rect(cx-410, cy-180, 35, 80);
+  context.restore();
+  context.fillStyle='hsl(195, 100%, 75%, 0.8)';
+  context.fill();
+
+  context.save();
+  context.translate(width/2, height/2);
+  context.scale(-1, 1);
+  context.beginPath();
+  context.rect(cx-410, cy-180, 35, 80);
+  context.restore();
+  context.fill();
+
+//*saucer
+  context.save();
+  context.translate(width/2, height/2);
+  context.rotate(Math.PI/180);
+  context.scale(1.2, 4/35);
+  context.beginPath();
+  context.moveTo(cx, cy - height/2);
+  context.bezierCurveTo(cx+ width/2, cy - height/2, cx + width/2, cy + height/2, cx, cy + height/2);
+  context.bezierCurveTo(cx - width/2, cy + height/2, cx - width/2, cy - height/2, cx, cy - height/2);
+  context.restore();
+  context.fillStyle='rgb(220, 220, 220)';
+  context.fill();
+}
+
+function drawEngine(cx, cy, r) {
+  context.save();
+  context.beginPath();
+  context.arc(cx+width/2.01, cy+height/1.27, r/1.5, 0, 2 * Math.PI, false);
+  context.restore();
+  context.fill();
+
+  context.save();
+  context.beginPath();
+  context.arc(cx+width/2.01, cy+height/1.27, r/2, 0, 2 * Math.PI, false);
+  context.restore();
+  context.fillStyle='hsl(195, 100%, 75%, 0.6)';
+  context.fill();
+}
+
+function drawText(cx, cy){
+
+  var depth = 5;
+  context.shadowColor='darkgrey';
+  context.shadowBlur = 4;
+  context.shadowOffsetX = depth+2;
+  context.shadowOffsetY = depth+2;
+  context.save();
+  context.font='10pt Arial';
+  context.fillStyle='black';
+  context.setTransform(scaleShipName, 0, 0.2, 0.5, cx + width/2 - ussTextMeasure.width * scaleShipName / 2-100, cy + height/2);
+  context.fillText(shipName, 30, 0);
+  context.font='15pt Arial';
+  context.setTransform(scaleCode, 0, 0.2, 0.3, cx + width/2 - codeTextMeasure.width * scaleCode / 2, cy + height/2 + 20 + 3);
+  context.fillText(codeName, 30, 0);
+  context.restore();
+}
+
+function draw() {
+  context.fillStyle = 'black';
+  context.fillRect(0, 0, width, height);
+
+  drawStars();
+
+  var cx = 0;
+  var cy = 0;
+  var r = 100;
+  
+  context.save();
+  context.globalAlpha = 0.35;
+  context.drawImage(img, 260, 100);
+  context.restore();
+
+  drawEnterprise(cx, cy, r);
+
+  drawEngine(cx, cy, r);
+
+  drawText(cx, cy);
+
+}
+
+ function update (){
+   draw();
+   window.requestAnimationFrame(update);
+}
+
+update();</script>
+</body>
+</html>
